@@ -1,21 +1,13 @@
 import express from 'express';
 import cors from 'cors';
-import pino from 'npm i pino-http';
-import dotenv from 'dotenv';
-import { getAllContacts } from './services/contacts.js';
-import { setupServer } from './server.js';
+import pino from 'pino-http';
 import { initMongoConnection } from './db/initMongoConnection.js';
 import { getAllContacts, getContactById } from './services/contacts.js';
-
-// Завантаження змінних оточення з файлу .env
-dotenv.config();
+import { env } from './utils/env.js';
 
 const startApp = async () => {
   await initMongoConnection();
-  setupServer();
 };
-
-startApp();
 
 export const setupServer = () => {
   const app = express();

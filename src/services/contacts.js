@@ -1,4 +1,5 @@
 import Contact from '../db/Contact.js';
+import createError from 'http-errors';
 
 export const getAllContacts = async (req, res) => {
   try {
@@ -32,5 +33,41 @@ export const getContactById = async (req, res) => {
     res
       .status(500)
       .json({ status: 'error', message: 'Error fetching contact' });
+  }
+};
+
+export const createContact = async (contactData) => {
+  try {
+    const newContact = await Contact.create(contactData);
+    return newContact;
+  } catch (error) {
+    throw new Error('Error creating contact');
+  }
+};
+export const updateContactById = async (contactId, updateData) => {
+  try {
+    const existingContact = await Contact.findById(contactId);
+    if (!existingContact) {
+      throw createError(404, 'Contact not found');
+    }
+
+    Object.assign(existingContact, updateData);
+
+    const updatedContact = await existingContact.save();
+    return updatedContact;
+  } catch (error) {
+    throw error;
+  }
+};
+export const deleteContactById = async (contactId) => {
+  try {
+    const existingContact = await Contact.findById(contactId);
+    if (!existingContact) {
+      throw createError(404, 'Contact not found');
+    }
+
+    await existingContact.remove();
+  } catch (error) {
+    throw error;
   }
 };

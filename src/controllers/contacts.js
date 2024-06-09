@@ -1,7 +1,9 @@
 import {
-  getAllContacts as serviceGetAllContacts,
-  getContactById as serviceGetContactById,
+  getAllContacts,
+  getContactById,
   createContact,
+  updateContactById,
+  deleteContactById,
 } from '../services/contacts.js';
 
 import createError from 'http-errors';
@@ -17,98 +19,75 @@ export const ctrlWrapper = (ctrl) => {
 };
 
 export const createNewContact = async (req, res, next) => {
-  try {
-    const { name, phoneNumber, email, isFavourite, contactType } = req.body;
+  const { name, phoneNumber } = req.body;
 
-    if (!name || !phoneNumber) {
-      throw createError(400, 'Name and phoneNumber are required');
-    }
-
-    const newContact = await createContact({
-      name,
-      phoneNumber,
-      email,
-      isFavourite,
-      contactType,
-    });
-
-    res.status(201).json({
-      status: 'success',
-      message: 'Successfully created a contact!',
-      data: newContact,
-    });
-  } catch (error) {
-    next(error);
+  if (!name || !phoneNumber) {
+    return next(createError(400, 'Name and phoneNumber are required'));
   }
+
+  const newContact = await createContact(req.body);
+  res.json({
+    status: 201,
+    message: 'Successfully created a contact!',
+    data: newContact,
+  });
 };
 
 export const updateContact = async (req, res, next) => {
-  try {
-    const { contactId } = req.params;
-    const { name, phoneNumber, email, isFavourite, contactType } = req.body;
+  const { contactId } = req.params;
 
-    const updatedContact = await updateContactById(contactId, {
-      name,
-      phoneNumber,
-      email,
-      isFavourite,
-      contactType,
-    });
-    res.status(200).json({
-      status: 'success',
-      message: 'Successfully patched a contact!',
-      data: updatedContact,
-    });
-  } catch (error) {
-    if (error.status && error.message) {
-      next(error);
-    } else {
-      next(createError(500, 'Error patching contact'));
-    }
+  const updatedContact = await updateContactById(contactId, req.body);
+
+  res.json({
+    status: 200,
+    message: 'Successfully patched a contact!',
+    data: updatedContact,
+  });
+  if (!updatedContact) {
+    next(createError(404, 'Contact not found'));
+    return;
   }
 };
 
 export const deleteContact = async (req, res, next) => {
-  try {
-    const { contactId } = req.params;
+  const { contactId } = req.params;
 
-    await deleteContactById(contactId);
+  const deletedContact = await deleteContactById(contactId);
 
-    res.status(204).send();
-  } catch (error) {
-    if (error.status && error.message) {
-      next(error);
-    } else {
-      next(createError(500, 'Error deleting contact'));
-    }
+  if (!deletedContact) {
+    next(createError(404, 'Contact not found'));
+    return;
   }
+
+  res.status(204).send();
 };
 
-export const getAllContacts = async (req, res, next) => {
-  try {
-    const contacts = await serviceGetAllContacts();
-    res.json(contacts);
-  } catch (error) {
-    next(error);
-  }
+export const getContactsAll = async (res) => {
+  const contacts = await getAllContacts();
+  res.json({
+    status: 200,
+    message: 'Successfully found contacts!',
+    data: contacts,
+  });
 };
 
-export const getContactById = async (req, res, next) => {
-  try {
-    const { contactId } = req.params;
-    const contact = await serviceGetContactById(contactId);
-    if (!contact) {
-      return next(createError(404, 'Contact not found'));
-    }
-    res.json(contact);
-  } catch (error) {
-    next(error);
+export const getByIdContact = async (req, res, next) => {
+  const { contactId } = req.params;
+
+  const contact = await getContactById(contactId);
+  if (!contact) {
+    return next(createError(404, 'Contact not found'));
   }
+  res.json({
+    status: 200,
+    message: `Successfully found contact with id ${contactId}!`,
+    data: contact,
+  });
 };
 
 export default {
-  getAllContacts: ctrlWrapper(getAllContacts),
-  getContactById: ctrlWrapper(getContactById),
+  getContactsAll: ctrlWrapper(getContactsAll),
+  getByIdContact: ctrlWrapper(getByIdContact),
   createNewContact: ctrlWrapper(createNewContact),
   updateContact: ctrlWrapper(updateContact),
   deleteContact: ctrlWrapper(deleteContact),

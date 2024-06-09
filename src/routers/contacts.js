@@ -1,7 +1,7 @@
 import express from 'express';
 import {
-  getAllContacts,
-  getContactById,
+  getContactsAll,
+  getByIdContact,
   ctrlWrapper,
   createNewContact,
   updateContact,
@@ -10,8 +10,8 @@ import {
 
 const router = express.Router();
 
-router.get('/contacts', ctrlWrapper(getAllContacts));
-router.get('/contacts/:contactId', ctrlWrapper(getContactById));
+router.get('/contacts', ctrlWrapper(getContactsAll));
+router.get('/contacts/:contactId', ctrlWrapper(getByIdContact));
 router.post('/contacts', ctrlWrapper(createNewContact));
 router.patch('/contacts/:contactId', ctrlWrapper(updateContact));
 router.delete('/contacts/:contactId', ctrlWrapper(deleteContact));

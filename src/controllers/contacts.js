@@ -84,11 +84,3 @@ export const getByIdContact = async (req, res, next) => {
     data: contact,
   });
 };
-
-export default {
-  getContactsAll: ctrlWrapper(getContactsAll),
-  getByIdContact: ctrlWrapper(getByIdContact),
-  createNewContact: ctrlWrapper(createNewContact),
-  updateContact: ctrlWrapper(updateContact),
-  deleteContact: ctrlWrapper(deleteContact),
-};

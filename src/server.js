@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import pino from 'pino-http';
+import { HttpError } from 'http-errors';
 import { initMongoConnection } from './db/initMongoConnection.js';
 import contactsRouter from './routers/contacts.js';
 import { env } from './utils/env.js';
@@ -14,9 +15,17 @@ const notFoundHandler = (req, res, next) => {
 };
 
 const errorHandler = (err, req, res, next) => {
-  console.error(err);
+  if (err instanceof HttpError) {
+    res.status(err.status).json({
+      status: err.status,
+      message: err.name,
+      data: err,
+    });
+    return;
+  }
+
   res.status(500).json({
-    status: 'error',
+    status: 500,
     message: 'Something went wrong',
     data: err.message,
   });
@@ -28,8 +37,8 @@ export const setupServer = () => {
 
   app.use(cors());
   app.use(pino());
-
-  app.use(contactsRouter);
+  app.use(express.json());
+  app.use('/api', contactsRouter);
 
   app.use(notFoundHandler);
 

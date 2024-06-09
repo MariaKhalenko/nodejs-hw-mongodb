@@ -1,5 +1,4 @@
 import Contact from '../db/Contact.js';
-import createError from 'http-errors';
 
 export const getAllContacts = async () => {
   const contacts = await Contact.find();

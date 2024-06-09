@@ -2,10 +2,10 @@ import express from 'express';
 import {
   getContactsAll,
   getByIdContact,
-  ctrlWrapper,
   createNewContact,
   updateContact,
   deleteContact,
+  ctrlWrapper,
 } from '../controllers/contacts.js';
 
 const router = express.Router();

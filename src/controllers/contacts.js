@@ -37,16 +37,16 @@ export const updateContact = async (req, res, next) => {
   const { contactId } = req.params;
 
   const updatedContact = await updateContactById(contactId, req.body);
+  if (!updatedContact) {
+    next(createError(404, 'Contact not found'));
+    return;
+  }
 
   res.json({
     status: 200,
     message: 'Successfully patched a contact!',
     data: updatedContact,
   });
-  if (!updatedContact) {
-    next(createError(404, 'Contact not found'));
-    return;
-  }
 };
 
 export const deleteContact = async (req, res, next) => {
@@ -62,7 +62,7 @@ export const deleteContact = async (req, res, next) => {
   res.status(204).send();
 };
 
-export const getContactsAll = async (res) => {
+export const getContactsAll = async (req, res, next) => {
   const contacts = await getAllContacts();
   res.json({
     status: 200,

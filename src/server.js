@@ -2,13 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import pino from 'pino-http';
 import { HttpError } from 'http-errors';
-import { initMongoConnection } from './db/initMongoConnection.js';
 import contactsRouter from './routers/contacts.js';
-import { env } from './utils/env.js';
-
-const startApp = async () => {
-  await initMongoConnection();
-};
 
 const notFoundHandler = (req, res, next) => {
   res.status(404).json({ message: 'Route not found' });

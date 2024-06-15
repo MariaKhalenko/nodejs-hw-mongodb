@@ -5,18 +5,15 @@ import {
   updateContactById,
   deleteContactById,
 } from '../services/contacts.js';
-
+import { validateBody } from '../middleware/Contacts.js';
+import { createContactSchema, updateContactSchema } from '../db/Contact.js';
+import { parsePaginationParams } from '../utils/parsePaginationParams.js';
+import { parseSortParams } from '../utils/parseSortParams.js';
+import { parseFilterParams } from '../utils/parseFilterParams.js';
 import createError from 'http-errors';
 
-export const ctrlWrapper = (ctrl) => {
-  return async (req, res, next) => {
-    try {
-      await ctrl(req, res, next);
-    } catch (error) {
-      next(error);
-    }
-  };
-};
+export const validateCreateContact = validateBody(createContactSchema);
+export const validateUpdateContact = validateBody(updateContactSchema);
 
 export const createNewContact = async (req, res, next) => {
   const { name, phoneNumber } = req.body;
@@ -63,11 +60,22 @@ export const deleteContact = async (req, res, next) => {
 };
 
 export const getContactsAll = async (req, res, next) => {
-  const contacts = await getAllContacts();
+  const { page = 1, perPage = 10 } = parsePaginationParams(req.query);
+  const { sortBy, sortOrder } = parseSortParams(req.query);
+  const filter = parseFilterParams(req.query);
+
+  const contactsData = await getAllContacts({
+    page,
+    perPage,
+    sortBy,
+    sortOrder,
+    filter,
+  });
+
   res.json({
     status: 200,
     message: 'Successfully found contacts!',
-    data: contacts,
+    data: contactsData,
   });
 };
 

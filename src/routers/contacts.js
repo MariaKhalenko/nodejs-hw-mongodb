@@ -5,15 +5,24 @@ import {
   createNewContact,
   updateContact,
   deleteContact,
-  ctrlWrapper,
 } from '../controllers/contacts.js';
+import {
+  validateCreateContact,
+  validateUpdateContact,
+} from '../controllers/contacts.js';
+
+import { ctrlWrapper } from '../middleware/Contacts.js';
 
 const router = Router();
 
 router.get('/contacts', ctrlWrapper(getContactsAll));
 router.get('/contacts/:contactId', ctrlWrapper(getByIdContact));
-router.post('/contacts', ctrlWrapper(createNewContact));
-router.patch('/contacts/:contactId', ctrlWrapper(updateContact));
+router.post('/contacts', validateCreateContact, ctrlWrapper(createNewContact));
+router.patch(
+  '/contacts/:contactId',
+  validateUpdateContact,
+  ctrlWrapper(updateContact),
+);
 router.delete('/contacts/:contactId', ctrlWrapper(deleteContact));
 
 export default router;

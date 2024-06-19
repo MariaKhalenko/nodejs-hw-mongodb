@@ -5,15 +5,10 @@ import {
   updateContactById,
   deleteContactById,
 } from '../services/contacts.js';
-import { validateBody } from '../middleware/Contacts.js';
-import { createContactSchema, updateContactSchema } from '../db/Contact.js';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
 import { parseFilterParams } from '../utils/parseFilterParams.js';
 import createError from 'http-errors';
-
-export const validateCreateContact = validateBody(createContactSchema);
-export const validateUpdateContact = validateBody(updateContactSchema);
 
 export const createNewContact = async (req, res, next) => {
   const { name, phoneNumber } = req.body;

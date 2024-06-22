@@ -1,36 +1,76 @@
 import Contact from '../db/Contact.js';
+import { calculatePaginationData } from '../utils/calculatePaginationData.js';
+import { SORT_ORDER } from '../constants/index.js';
 
-export const getAllContacts = async (req, res) => {
-  try {
-    const contacts = await Contact.find({});
-    res.status(200).json({
-      status: 'success',
-      message: 'Successfully found contacts!',
-      data: contacts,
-    });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ status: 'error', message: 'Error fetching contacts' });
+export const getAllContacts = async ({
+  page = 1,
+  perPage = 10,
+  sortOrder = SORT_ORDER.ASC,
+  sortBy = 'id',
+  filter = {},
+}) => {
+  const limit = perPage;
+  const skip = (page - 1) * perPage;
+
+  const contactsQuery = Contact.find();
+  if (filter.isFavourite !== undefined) {
+    contactsQuery.where('isFavourite').equals(filter.isFavourite);
   }
+
+  if (filter.contactType) {
+    contactsQuery.where('contactType').equals(filter.contactType);
+  }
+
+  const [contactsCount, contacts] = await Promise.all([
+    Contact.find().merge(contactsQuery).countDocuments(),
+    contactsQuery
+      .skip(skip)
+      .limit(limit)
+      .sort({ [sortBy]: sortOrder })
+      .exec(),
+  ]);
+
+  const paginationData = calculatePaginationData(
+    contactsCount,
+    page,
+    perPage,
+    contacts,
+  );
+
+  return {
+    ...paginationData,
+    data: contacts,
+  };
 };
 
-export const getContactById = async (req, res) => {
-  const { contactId } = req.params;
-  try {
-    const contact = await Contact.findById(contactId);
-    if (!contact) {
-      res.status(404).json({ status: 'error', message: 'Contact not found' });
-      return;
-    }
-    res.status(200).json({
-      status: 'success',
-      message: `Successfully found contact with id ${contactId}!`,
-      data: contact,
-    });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ status: 'error', message: 'Error fetching contact' });
-  }
+export const getContactById = async (contactId) => {
+  const contact = await Contact.findById(contactId);
+  return contact;
+};
+
+export const createContact = async (contactData) => {
+  const newContact = await Contact.create(contactData);
+  return newContact;
+};
+
+export const updateContactById = async (
+  contactId,
+  contactData,
+  options = {},
+) => {
+  const existingContact = await Contact.findByIdAndUpdate(
+    contactId,
+    contactData,
+    {
+      new: true,
+      ...options,
+    },
+  );
+
+  return existingContact;
+};
+
+export const deleteContactById = async (contactId) => {
+  const existingContact = await Contact.findByIdAndDelete(contactId);
+  return existingContact;
 };

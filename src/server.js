@@ -1,21 +1,8 @@
 import express from 'express';
 import cors from 'cors';
-import pino from 'npm i pino-http';
-import dotenv from 'dotenv';
-import { getAllContacts } from './services/contacts.js';
-import { setupServer } from './server.js';
-import { initMongoConnection } from './db/initMongoConnection.js';
-import { getAllContacts, getContactById } from './services/contacts.js';
-
-// Завантаження змінних оточення з файлу .env
-dotenv.config();
-
-const startApp = async () => {
-  await initMongoConnection();
-  setupServer();
-};
-
-startApp();
+import pino from 'pino-http';
+import router from './routers/contacts.js';
+import { notFoundHandler, errorHandler } from './middlewares/errorHandlers.js';
 
 export const setupServer = () => {
   const app = express();
@@ -23,13 +10,11 @@ export const setupServer = () => {
 
   app.use(cors());
   app.use(pino());
+  app.use(express.json());
+  app.use(router);
 
-  app.get('/contacts', getAllContacts);
-  app.get('/contacts/:contactId', getContactById);
-
-  app.use((req, res, next) => {
-    res.status(404).json({ message: 'Not found' });
-  });
+  app.use(notFoundHandler);
+  app.use(errorHandler);
 
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

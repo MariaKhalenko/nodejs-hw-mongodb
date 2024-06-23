@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+const { Schema } = mongoose;
 
 const contactSchema = new mongoose.Schema(
   {
@@ -12,6 +13,7 @@ const contactSchema = new mongoose.Schema(
       required: true,
       default: 'personal',
     },
+    userId: { type: Schema.Types.ObjectId, ref: 'users', required: true },
   },
   { timestamps: true, versionKey: false },
 );

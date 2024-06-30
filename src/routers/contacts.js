@@ -18,22 +18,20 @@ import { authenticate } from '../middlewares/authenticate.js';
 const router = Router();
 router.use(authenticate);
 
-router.get('/contacts', ctrlWrapper(getContactsAll));
-router.get('/contacts/:contactId', isValidId, ctrlWrapper(getByIdContact));
+router.get('/', ctrlWrapper(getContactsAll));
+router.get('/:contactId', isValidId, ctrlWrapper(getByIdContact));
 router.post(
-  '/contacts',
+  '/',
   validateBody(createContactSchema),
   ctrlWrapper(createNewContact),
 );
 router.patch(
-  '/contacts/:contactId',
+  '/:contactId',
   isValidId,
   validateBody(updateContactSchema),
   ctrlWrapper(updateContact),
 );
-router.delete('/contacts/:contactId', isValidId, ctrlWrapper(deleteContact));
-
-router.get('/', ctrlWrapper(getContactsAll));
+router.delete('/:contactId', isValidId, ctrlWrapper(deleteContact));
 
 const contactsRouter = router;
 export default contactsRouter;

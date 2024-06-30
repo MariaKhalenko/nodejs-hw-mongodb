@@ -17,7 +17,7 @@ export const createNewContact = async (req, res, next) => {
     return next(createError(400, 'Name and phoneNumber are required'));
   }
 
-  const newContact = await createContact(req.body);
+  const newContact = await createContact({ ...req.body, userId });
   res.json({
     status: 201,
     message: 'Successfully created a contact!',

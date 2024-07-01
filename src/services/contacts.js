@@ -59,9 +59,10 @@ export const createContact = async (contactData) => {
 
 export const updateContactById = async (
   contactId,
-  userId,
+
   contactData,
   options = {},
+  userId,
 ) => {
   const existingContact = await Contact.findOneAndUpdate(
     {

@@ -18,6 +18,25 @@ export const getAllContacts = async ({
     contactsQuery.where('isFavourite').equals(filter.isFavourite);
   }
 
+
+export const getContactById = async (req, res) => {
+  const { contactId } = req.params;
+  try {
+    const contact = await Contact.findById(contactId);
+    if (!contact) {
+      res.status(404).json({ status: '404', message: 'Contact not found' });
+      return;
+    }
+    res.status(200).json({
+      status: 'success',
+      message: `Successfully found contact with id ${contactId}!`,
+      data: contact,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ status: 'error', message: 'Error fetching contact' });
+
   if (filter.contactType) {
     contactsQuery.where('contactType').equals(filter.contactType);
   }

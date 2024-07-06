@@ -4,6 +4,7 @@ import pino from 'pino-http';
 import cookieParser from 'cookie-parser';
 import router from './routers/index.js';
 import { notFoundHandler, errorHandler } from './middlewares/errorHandlers.js';
+import { UPLOAD_DIR } from './constants/index.js';
 
 export const setupServer = () => {
   const app = express();
@@ -17,6 +18,7 @@ export const setupServer = () => {
 
   app.use(notFoundHandler);
   app.use(errorHandler);
+  app.use('/uploads', express.static(UPLOAD_DIR));
 
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

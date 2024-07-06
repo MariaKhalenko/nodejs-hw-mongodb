@@ -3,6 +3,7 @@ import {
   loginUser,
   logoutUser,
   refreshUsersSession,
+  resetPassword,
 } from '../services/auth.js';
 import { ONE_DAY } from '../constants/index.js';
 import createError from 'http-errors';
@@ -86,4 +87,23 @@ export const refreshUserSessionController = async (req, res) => {
   } catch (error) {
     next(createError(500, 'Failed to refresh session'));
   }
+};
+
+import { requestResetToken } from '../services/auth.js';
+
+export const requestResetEmailController = async (req, res) => {
+  await requestResetToken(req.body.email);
+  res.json({
+    message: 'Reset password email was successfully sent!',
+    status: 200,
+    data: {},
+  });
+};
+export const resetPasswordController = async (req, res) => {
+  await resetPassword(req.body);
+  res.json({
+    message: 'Password was successfully reset!',
+    status: 200,
+    data: {},
+  });
 };

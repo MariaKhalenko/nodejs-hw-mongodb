@@ -42,7 +42,7 @@ export const getContactById = async (req, res) => {
   }
 
   const [contactsCount, contacts] = await Promise.all([
-    Contact.find(userId).merge(contactsQuery).countDocuments(),
+    Contact.find({ userId }).merge(contactsQuery).countDocuments(),
     contactsQuery
       .skip(skip)
       .limit(limit)

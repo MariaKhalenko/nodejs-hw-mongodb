@@ -23,7 +23,7 @@ export const getAllContacts = async ({
   }
 
   const [contactsCount, contacts] = await Promise.all([
-    Contact.find(userId).merge(contactsQuery).countDocuments(),
+    Contact.find({ userId }).merge(contactsQuery).countDocuments(),
     contactsQuery
       .skip(skip)
       .limit(limit)
@@ -59,21 +59,17 @@ export const createContact = async (contactData) => {
 
 export const updateContactById = async (
   contactId,
-
-  contactData,
-  options = {},
+  contactData = {},
   userId,
 ) => {
+  const options = { new: true, includeResultMetadata: true };
   const existingContact = await Contact.findOneAndUpdate(
     {
       _id: contactId,
       userId,
     },
     contactData,
-    {
-      new: true,
-      ...options,
-    },
+    options,
   );
 
   return existingContact;

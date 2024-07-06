@@ -9,6 +9,7 @@ import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
 import { parseFilterParams } from '../utils/parseFilterParams.js';
 import createError from 'http-errors';
+import createHttpError from 'http-errors';
 
 export const createNewContact = async (req, res, next) => {
   const { name, phoneNumber } = req.body;
@@ -30,8 +31,7 @@ export const updateContact = async (req, res, next) => {
   const userId = req.user._id;
   const updatedContact = await updateContactById(contactId, req.body, userId);
   if (!updatedContact) {
-    next(createError(404, 'Contact not found'));
-    return;
+    throw createHttpError(404, 'Contact not found');
   }
 
   res.json({

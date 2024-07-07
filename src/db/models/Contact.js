@@ -14,7 +14,7 @@ const contactSchema = new Schema(
       default: 'personal',
     },
     userId: { type: Schema.Types.ObjectId, ref: 'users', required: true },
-    photo: { type: String },
+    photo: { type: String, required: false },
   },
   { timestamps: true, versionKey: false },
 );

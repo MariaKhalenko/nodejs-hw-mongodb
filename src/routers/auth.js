@@ -31,9 +31,6 @@ router.post(
 router.post('/logout', ctrlWrapper(logoutUserController));
 router.post('/refresh', ctrlWrapper(refreshUserSessionController));
 
-const authRouter = router;
-export default authRouter;
-
 router.post(
   '/send-reset-email',
   validateBody(requestResetEmailSchema),
@@ -44,3 +41,5 @@ router.post(
   validateBody(resetPasswordSchema),
   ctrlWrapper(resetPasswordController),
 );
+const authRouter = router;
+export default authRouter;

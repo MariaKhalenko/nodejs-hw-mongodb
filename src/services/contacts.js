@@ -59,21 +59,17 @@ export const createContact = async (contactData) => {
 
 export const updateContactById = async (
   contactId,
-
-  contactData,
-  options = {},
+  contactData = {},
   userId,
 ) => {
+  const options = { new: true, includeResultMetadata: true };
   const existingContact = await Contact.findOneAndUpdate(
     {
       _id: contactId,
       userId,
     },
     contactData,
-    {
-      new: true,
-      ...options,
-    },
+    options,
   );
 
   return existingContact;

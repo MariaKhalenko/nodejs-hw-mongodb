@@ -23,40 +23,18 @@ router.get('/', ctrlWrapper(getContactsAll));
 router.get('/:contactId', isValidId, ctrlWrapper(getByIdContact));
 router.post(
   '/',
+  upload.single('photo'),
   validateBody(createContactSchema),
   ctrlWrapper(createNewContact),
 );
 router.patch(
   '/:contactId',
   isValidId,
+  upload.single('photo'),
   validateBody(updateContactSchema),
   ctrlWrapper(updateContact),
 );
 router.delete('/:contactId', isValidId, ctrlWrapper(deleteContact));
-
-router.post(
-  '/',
-  checkRoles(ROLES.TEACHER),
-  validateBody(createContactSchema),
-  upload.single('photo'),
-  ctrlWrapper(createContactController),
-);
-
-router.put(
-  '/:contactId',
-  checkRoles(ROLES.TEACHER),
-  validateBody(createContactSchema),
-  upload.single('photo'),
-  ctrlWrapper(upsertContactController),
-);
-
-router.patch(
-  '/:contactId',
-  checkRoles(ROLES.TEACHER, ROLES.PARENT),
-  validateBody(updateContactSchema),
-  upload.single('photo'),
-  ctrlWrapper(patchContactController),
-);
 
 const contactsRouter = router;
 export default contactsRouter;

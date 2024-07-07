@@ -3,13 +3,17 @@ import jwt from 'jsonwebtoken';
 import handlebars from 'handlebars';
 import path from 'node:path';
 import fs from 'node:fs/promises';
-import { SMTP } from '../constants/index.js';
 import { env } from '../utils/env.js';
 import { sendEmail } from '../utils/sendMail.js';
 import createHttpError from 'http-errors';
 import { UsersCollection } from '../db/models/user.js';
 import { randomBytes } from 'crypto';
-import { FIFTEEN_MINUTES, ONE_DAY } from '../constants/index.js';
+import {
+  FIFTEEN_MINUTES,
+  THIRTY_DAYS,
+  SMTP,
+  TEMPLATES_DIR,
+} from '../constants/index.js';
 import { SessionsCollection } from '../db/models/session.js';
 
 export const registerUser = async (payload) => {
@@ -45,7 +49,7 @@ export const loginUser = async (payload) => {
     accessToken,
     refreshToken,
     accessTokenValidUntil: new Date(Date.now() + FIFTEEN_MINUTES),
-    refreshTokenValidUntil: new Date(Date.now() + ONE_DAY),
+    refreshTokenValidUntil: new Date(Date.now() + THIRTY_DAYS),
   });
 };
 
@@ -61,7 +65,7 @@ const createSession = () => {
     accessToken,
     refreshToken,
     accessTokenValidUntil: new Date(Date.now() + FIFTEEN_MINUTES),
-    refreshTokenValidUntil: new Date(Date.now() + ONE_DAY),
+    refreshTokenValidUntil: new Date(Date.now() + THIRTY_DAYS),
   };
 };
 
@@ -104,7 +108,7 @@ export const requestResetToken = async (email) => {
     },
     env('JWT_SECRET'),
     {
-      expiresIn: '15m',
+      expiresIn: '5m',
     },
   );
 
@@ -137,7 +141,8 @@ export const resetPassword = async (payload) => {
   try {
     entries = jwt.verify(payload.token, env('JWT_SECRET'));
   } catch (err) {
-    if (err instanceof Error) throw createHttpError(401, err.message);
+    if (err instanceof Error)
+      throw createHttpError(401, 'Token is expired or invalid.');
     throw err;
   }
 

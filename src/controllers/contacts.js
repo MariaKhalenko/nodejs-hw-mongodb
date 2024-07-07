@@ -15,23 +15,61 @@ import { env } from '../utils/env.js';
 
 export const createNewContact = async (req, res, next) => {
   const { name, phoneNumber } = req.body;
+  const photo = req.file;
+  let photoUrl;
+
+  if (photo) {
+    if (env('ENABLE_CLOUDINARY') === 'true') {
+      photoUrl = await saveFileToCloudinary(photo);
+    } else {
+      photoUrl = await saveFileToUploadDir(photo);
+      photoUrl = `${env('BASE_URL')}/uploads/${photo.filename}`;
+    }
+  }
+
   const userId = req.user._id;
   if (!name || !phoneNumber) {
     return next(createError(400, 'Name and phoneNumber are required'));
   }
 
-  const newContact = await createContact({ ...req.body, userId });
-  res.json({
-    status: 201,
-    message: 'Successfully created a contact!',
-    data: newContact,
-  });
+  try {
+    const contactData = {
+      ...req.body,
+      userId,
+      photo: photoUrl,
+    };
+
+    const newContact = await createContact(contactData);
+    res.json({
+      status: 201,
+      message: 'Successfully created a contact!',
+      data: newContact,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const updateContact = async (req, res, next) => {
   const { contactId } = req.params;
+  const photo = req.file;
+  let photoUrl;
+  if (photo) {
+    if (env('ENABLE_CLOUDINARY') === 'true') {
+      photoUrl = await saveFileToCloudinary(photo);
+    } else {
+      photoUrl = await saveFileToUploadDir(photo);
+      photoUrl = `${env('BASE_URL')}/uploads/${photo.filename}`;
+    }
+  }
+
   const userId = req.user._id;
-  const updatedContact = await updateContactById(contactId, req.body, userId);
+  const updatedContact = await updateContactById(
+    contactId,
+    req.body,
+    userId,
+    photoUrl,
+  );
   if (!updatedContact) {
     next(createError(404, 'Contact not found'));
     return;
@@ -40,7 +78,10 @@ export const updateContact = async (req, res, next) => {
   res.json({
     status: 200,
     message: 'Successfully patched a contact!',
-    data: updatedContact,
+    data: {
+      ...updatedContact,
+      photo: photoUrl,
+    },
   });
 };
 

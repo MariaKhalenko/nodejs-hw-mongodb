@@ -4,6 +4,7 @@ import {
   logoutUser,
   refreshUsersSession,
   resetPassword,
+  requestResetToken,
 } from '../services/auth.js';
 import { ONE_DAY } from '../constants/index.js';
 import createError from 'http-errors';
@@ -88,8 +89,6 @@ export const refreshUserSessionController = async (req, res) => {
     next(createError(500, 'Failed to refresh session'));
   }
 };
-
-import { requestResetToken } from '../services/auth.js';
 
 export const requestResetEmailController = async (req, res) => {
   await requestResetToken(req.body.email);
